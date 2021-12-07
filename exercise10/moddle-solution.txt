@@ -1,0 +1,20 @@
+1.Complete the query below such that it answers the following question: What are the grades of all restaurants that have at least one grade after 2012-01-12?
+
+db.restaurants.find({"grades.date" : {$gt: new ISODate("2012-01-12") }}, {grades: 1})
+
+
+2.How many Italian cuisine restaurants have at least 1 grade between A (inclusive) and C (inclusive)?
+Run the query in the MongoDB shell and enter the answer below.
+
+db.restaurants.find({"cuisine":"Italian", "grades.grade":{$gte:'A',$lte:'C'}}).count()
+
+3.How many restaurants exist IN Queens? Run the query in the MongoDB shell and enter the answer below.
+ db.restaurants.find({'borough':'Queens'},{borough:1}).count()
+ 
+4.Complete the query below such that it answers the following question: Which restaurants have only A grades?
+db.restaurants.find({ "grades": {"$not": { "$elemMatch": {"grade" :{$ne: "A" }}}}})
+about $elemMatch : https://docs.mongodb.com/manual/reference/operator/query/elemMatch/
+ 
+5.How many restaurants exist in Brooklyn with at least 1 grade A?
+Run the query in the MongoDB shell and enter the answer below.
+db.restaurants.find({"borough":"Brooklyn","grades.grade":"A"}).count()
