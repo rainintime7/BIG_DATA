@@ -1,3 +1,5 @@
+Some examples of exer10：https://codecollab.io/@bigdata/ex10
+
 1.Complete the query below such that it answers the following question: What are the grades of all restaurants that have at least one grade after 2012-01-12?
 
 db.restaurants.find({"grades.date" : {$gt: new ISODate("2012-01-12") }}, {grades: 1})
