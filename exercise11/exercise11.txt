@@ -1,0 +1,79 @@
+1.
+ %%rumble
+count(
+for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json", 10)
+where $i.guess eq $i.target and $i.target eq "Russian"
+return $i
+)
+
+2.
+ %%rumble
+count(distinct-values(
+for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json", 10)
+return $i.target
+))
+
+3.
+%%rumble
+for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json", 10)
+where $i.guess eq $i.target
+order by $i.target ascending, $i.country ascending, $i.date ascending
+count $c
+where $c <= 2
+return $i.sample
+
+4.
+%%rumble
+let $country_target_pair_cnts := for $i in json-file("confusion-2014-03-02/
+,confusion-2014-03-02.json", 10)
+group by $country := $i.country, $target := $i.target
+order by $country, $target
+return count($i)
+for $pair_cnt in $country_target_pair_cnts
+order by $pair_cnt descending
+count $c
+where $c <= 3
+return $pair_cnt
+
+5.
+%%rumble
+round(
+count(
+for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json",␣
+,→10)
+where $i.guess eq $i.target and $i.target eq $i.choices[[1]]
+return $i
+) div count(
+for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json",␣
+,→10)
+return $i
+), 4
+)
+
+6.
+a.
+%%rumble
+let $correct_pcts := for $i in json-file("confusion-2014-03-02/
+,→confusion-2014-03-02.json", 10)
+group by $lang := $i.target
+let $correct_cnt := count(for $j in $i where $j.target eq $j.guess return␣
+,→$j)
+let $lang_cnt := count(for $j in $i return $j)
+return {"lang": $lang, "correct_pct": $correct_cnt div $lang_cnt}
+for $i in $correct_pcts
+order by $i.correct_pct descending
+count $c
+where $c <= 3
+return $i.lang
+
+b.
+let $gp_correct:=for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json",10)     where $i.target eq $i.guess      group by $lang:=$i.target     return {"target":$lang,"cnt":count($i)} let $gp_cnt:=for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json",10)     group by $lang:=$i.target     return {"target":$lang,"cnt":count($i)} let $per := for $j in $gp_correct,$k in $gp_cnt     where $j.target eq $k.target     return {"target":$j.target,"percent":($j.cnt div $k.cnt)} for $i in $per order by $i.percent descending count $c where $c<=3 return $i.target
+
+7.
+%%rumble
+for $i in json-file("confusion-2014-03-02/confusion-2014-03-02.json", 10)
+group by $date := $i.date
+order by $date descending
+count $c
+where $c <= 1
+return count($i)
